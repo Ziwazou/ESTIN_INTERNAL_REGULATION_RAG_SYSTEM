@@ -1,0 +1,94 @@
+# =============================================================================
+# ESTIN RAG System - Python Dependencies
+# =============================================================================
+# This file lists all Python packages needed for the project.
+# 
+# 💡 WHY VERSION PINNING?
+# We pin specific versions (e.g., langchain>=1.0.0) to ensure:
+# 1. Reproducibility - Same code works the same way everywhere
+# 2. Stability - Avoid breaking changes from updates
+# 3. Security - Known, tested versions
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Core LangChain Ecosystem (v1.2+ - Latest stable as of January 2026)
+# -----------------------------------------------------------------------------
+# 💡 LANGCHAIN v1.0+ CHANGES:
+# - New `create_agent` function replaces old agent patterns
+# - Built on LangGraph with simpler interface
+# - All chains and agents unified under one abstraction
+# - Python 3.10+ required (3.9 dropped)
+#
+# langchain: The main framework (v1.2.4 is latest)
+# langchain-core: Core abstractions - must match langchain version
+# langchain-community: Community integrations (vector stores, document loaders)
+# langchain-openai: OpenAI-specific integrations (v1.0+ for compatibility)
+# langgraph: Underlying graph-based agent architecture (v1.0+ required)
+langchain>=1.2.0
+langchain-core>=1.2.0
+langchain-community>=0.4.0
+langchain-openai>=1.0.0
+langgraph>=1.0.0
+
+# -----------------------------------------------------------------------------
+# Text Processing
+# -----------------------------------------------------------------------------
+# langchain-text-splitters: For chunking documents into smaller pieces
+# Must be v1.0+ to match langchain v1.x ecosystem
+langchain-text-splitters>=1.0.0
+
+# -----------------------------------------------------------------------------
+# Vector Stores
+# -----------------------------------------------------------------------------
+# chromadb: Open-source embedding database (great for development)
+# faiss-cpu: Facebook AI Similarity Search (production-grade, CPU version)
+chromadb>=0.5.0
+faiss-cpu>=1.8.0
+
+# -----------------------------------------------------------------------------
+# Document Loaders
+# -----------------------------------------------------------------------------
+# pypdf: For loading PDF documents (ESTIN regulations are likely PDFs)
+# python-docx: For Word documents
+# unstructured: Universal document parser
+pypdf>=4.0.0
+python-docx>=1.1.0
+
+# -----------------------------------------------------------------------------
+# API Framework
+# -----------------------------------------------------------------------------
+# fastapi: Modern, fast web framework for building APIs
+# uvicorn: ASGI server to run FastAPI
+# python-multipart: For file uploads
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.9
+
+# -----------------------------------------------------------------------------
+# Configuration & Environment
+# -----------------------------------------------------------------------------
+# python-dotenv: Load environment variables from .env file
+# pydantic-settings: Settings management with validation
+# pydantic: Data validation (v2.10+ required for LangChain v1.x)
+python-dotenv>=1.0.0
+pydantic>=2.10.0,<3.0.0
+pydantic-settings>=2.0.0
+
+# -----------------------------------------------------------------------------
+# Development Tools
+# -----------------------------------------------------------------------------
+# pytest: Testing framework
+# black: Code formatter
+# isort: Import sorter
+# mypy: Static type checker
+pytest>=8.0.0
+black>=24.0.0
+isort>=5.13.0
+mypy>=1.8.0
+
+# -----------------------------------------------------------------------------
+# Jupyter (for experimentation)
+# -----------------------------------------------------------------------------
+jupyter>=1.0.0
+ipykernel>=6.29.0
+
