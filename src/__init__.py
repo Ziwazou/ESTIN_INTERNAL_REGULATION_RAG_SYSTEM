@@ -14,3 +14,20 @@
 
 __version__ = "0.1.0"
 
+#make src as package       
+from . import api
+from . import config
+from . import embeddings
+from . import rag
+from . import vectorstore
+from . import data_processing
+
+__all__ = [
+    "api",
+    "config",
+    "embeddings",
+    "rag",
+    "vectorstore",
+    "data_processing",
+]
+

@@ -95,10 +95,16 @@ RI_ESTIN_RAG/
 4. **Set up environment variables**
    ```bash
    cp .env.example .env
-   # Edit .env with your API keys
+   # Edit .env with your API keys (Pinecone, Groq, HuggingFace)
    ```
 
-5. **Run the application**
+5. **Build the vector store index** ⚠️ **REQUIRED**
+   ```bash
+   python scripts/build_index.py
+   ```
+   This step is **necessary** - it loads the PDF documents, chunks them, generates embeddings, and uploads them to Pinecone. Without this, the RAG system won't have any documents to retrieve from.
+
+6. **Run the application**
    ```bash
    uvicorn src.api.main:app --reload
    ```

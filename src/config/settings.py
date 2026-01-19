@@ -8,19 +8,20 @@ class Settings(BaseSettings):
     
     hf_api_key: str
 
-    chroma_api_key: str
+    pinecone_api_key: str
     
     # -------------------------------------------------------------------------
-    # Vector Store Configuration
+    # Vector Store Configuration (Pinecone)
     # -------------------------------------------------------------------------
-    chroma_persist_directory: str = "./data/chroma_db"
-    chroma_collection_name: str = "estin_regulations"
+    pinecone_index_name: str = "estin-regulations"
+    pinecone_cloud: str = "aws"
+    pinecone_region: str = "us-east-1"
     
     # -------------------------------------------------------------------------
     # Application Settings
     # -------------------------------------------------------------------------
     environment: str = "development"
-    api_host: str = "0.0.0.0"
+    api_host: str = "127.0.0.1"
     api_port: int = 8000
     log_level: str = "INFO"
     
