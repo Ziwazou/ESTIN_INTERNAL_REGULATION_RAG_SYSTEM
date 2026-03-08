@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESTIN Assistant - Règlement Intérieur</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+            <div class="shape shape-5"></div>
+        </div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Landing Section (Before Chat) -->
+        <section id="landing" class="landing-section">
+            <div class="landing-content">
+                <!-- Logo & Branding -->
+                <div class="brand-container">
+                    <div class="logo-wrapper">
+                        <div class="logo-glow"></div>
+                        <div class="logo">
+                            <span class="logo-icon">📚</span>
+                        </div>
+                    </div>
+                    <h1 class="title">
+                        <span class="title-line">ESTIN</span>
+                        <span class="title-accent">Assistant</span>
+                    </h1>
+                </div>
+
+                <!-- Interactive Avatar -->
+                <div class="avatar-container" id="avatar">
+                    <div class="avatar-ring"></div>
+                    <div class="avatar-ring ring-2"></div>
+                    <div class="avatar-core">
+                        <div class="avatar-face">
+                            <div class="eye left"></div>
+                            <div class="eye right"></div>
+                            <div class="mouth"></div>
+                        </div>
+                    </div>
+                    <div class="avatar-pulse"></div>
+                </div>
+
+                <!-- Call to Action -->
+                <div class="cta-container">
+                    <p class="cta-text">Posez vos questions sur le règlement intérieur de l'ESTIN</p>
+                    <button class="start-btn" id="startChat">
+                        <span class="btn-text">Commencer la conversation</span>
+                        <span class="btn-icon">→</span>
+                        <div class="btn-shine"></div>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat Section -->
+        <section id="chat" class="chat-section hidden">
+            <!-- Chat Header -->
+            <header class="chat-header">
+                <div class="header-left">
+                    <div class="header-avatar">
+                        <span>📚</span>
+                    </div>
+                    <div class="header-info">
+                        <h2>ESTIN Assistant</h2>
+                    </div>
+                </div>
+                <button class="header-btn" id="backToLanding" title="Retour">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+            </header>
+
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Message -->
+                <div class="message bot-message welcome-message">
+                    <div class="message-avatar">📚</div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <p>Bonjour ! 👋</p>
+                            <p>Je suis l'assistant virtuel de l'ESTIN. Je peux répondre à vos questions sur le <strong>règlement intérieur</strong> de l'école.</p>
+                            <p>Que souhaitez-vous savoir ?</p>
+                        </div>
+                        <span class="message-time">Maintenant</span>
+                    </div>
+                </div>
+
+                <!-- Quick Replies -->
+                <div class="quick-replies" id="quickReplies">
+                    <button class="quick-reply" data-question="Quelles sont les sanctions disciplinaires ?">
+                        ⚖️ Sanctions disciplinaires
+                    </button>
+                    <button class="quick-reply" data-question="Quelles sont les obligations des enseignants ?">
+                        👨‍🏫 Obligations enseignants
+                    </button>
+                    <button class="quick-reply" data-question="Quels sont les horaires de travail ?">
+                        🕐 Horaires de travail
+                    </button>
+                    <button class="quick-reply" data-question="Quelles sont les règles d'hygiène et sécurité ?">
+                        🛡️ Hygiène & Sécurité
+                    </button>
+                </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="typing-indicator hidden" id="typingIndicator">
+                <div class="message-avatar">📚</div>
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Posez votre question..." 
+                        rows="1"
+                        maxlength="1000"
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                        </svg>
+                    </button>
+                </div>
+                <p class="input-hint">Appuyez sur Entrée pour envoyer</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.0.0/marked.min.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
+

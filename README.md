@@ -1,130 +1,128 @@
-# ESTIN RAG System 🎓
+# ESTIN RAG
 
-A **Retrieval-Augmented Generation (RAG)** system designed to answer questions about the internal regulations of ESTIN (École Supérieure en Sciences et Technologies de l'Informatique et du Numérique).
+Système **RAG (Retrieval-Augmented Generation)** pour interroger le **règlement intérieur de l’ESTIN** (École Supérieure en Sciences et Technologies de l’Informatique et du Numérique, Béjaïa, Algérie).
 
-## 🎯 What is RAG?
+## Fonctionnalités
 
-RAG (Retrieval-Augmented Generation) is an AI architecture that enhances Large Language Models (LLMs) by:
-1. **Retrieving** relevant documents from a knowledge base
-2. **Augmenting** the LLM's context with these documents
-3. **Generating** accurate, grounded responses
+- **Chat web** : interface pour poser des questions en langage naturel
+- **Réponses basées sur le règlement** : recherche vectorielle (Pinecone) + LLM (Groq)
+- **Mémoire de conversation** : contexte conservé par fil de discussion
+- **Sources citées** : affichage des articles utilisés pour la réponse
+- **Rendu Markdown** : tableaux, titres et listes correctement affichés dans l’interface
 
-This prevents "hallucinations" and ensures answers are based on actual ESTIN regulations.
-
-## 🏗️ Architecture
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        User Question                             │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Query Embedding                               │
-│              (Convert question to vector)                        │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Vector Store Search                           │
-│            (Find similar document chunks)                        │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    LLM Generation                                │
-│         (Generate answer using retrieved context)                │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                        Answer                                    │
-└─────────────────────────────────────────────────────────────────┘
+Frontend (chat)  →  API FastAPI  →  Agent RAG (LangGraph)
+                                        ↓
+                        Outil de recherche  →  Pinecone (vecteurs)
+                        LLM Groq
 ```
 
-## 📁 Project Structure
+- **Frontend** : `frontend/` (HTML, JS, CSS) — chat et affichage des réponses
+- **API** : `src/api/main.py` — routes `/api/v1/ask`, `/health`, service du frontend
+- **RAG** : `src/rag/` — agent avec outil de recherche et mémoire
+- **Vector store** : `src/vectorstore/` — Pinecone (embeddings HuggingFace)
+
+Pour plus de détails, voir [DOCUMENTATION_PROJET.md](DOCUMENTATION_PROJET.md).
+
+## Prérequis
+
+- **Python 3.10+**
+- Clés API : **Groq**, **HuggingFace**, **Pinecone**
+
+## Installation et démarrage
+
+### 1. Cloner et environnement
+
+```bash
+git clone <url-du-repo>
+cd RI_ESTIN_RAG
+python -m venv venv
+```
+
+**Windows (PowerShell)** :
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+**Linux / macOS** :
+```bash
+source venv/bin/activate
+```
+
+### 2. Dépendances
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Variables d’environnement
+
+Créer un fichier **`.env`** à la racine du projet :
+
+```env
+GROQ_API_KEY=votre_cle_groq
+HF_API_KEY=votre_cle_huggingface
+PINECONE_API_KEY=votre_cle_pinecone
+
+# Optionnel
+PINECONE_INDEX_NAME=estin-regulations
+API_HOST=0.0.0.0
+API_PORT=8000
+```
+
+### 4. Données et index vectoriel
+
+- Placer le PDF du règlement dans : **`data/documents/Reglement-interieur-ESTIN.pdf`**
+- Construire l’index (à faire une fois, ou après modification du PDF) :
+
+```bash
+python scripts/build_index.py
+```
+
+Pour recréer l’index from scratch, mettre `reset=True` dans l’appel à `build_index()` dans le script puis relancer la commande ci‑dessus.
+
+### 5. Lancer l’application
+
+Depuis la racine du projet :
+
+```bash
+python -m uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Ou :
+
+```bash
+python -m src.api.main
+```
+
+Ouvrir dans le navigateur : **http://localhost:8000/**  
+- Interface : chat  
+- Santé : http://localhost:8000/health  
+- Doc API : http://localhost:8000/docs  
+
+## Structure du projet
 
 ```
 RI_ESTIN_RAG/
+├── frontend/           # Interface chat (HTML, JS, CSS)
 ├── src/
-│   ├── config/          # Configuration and settings
-│   ├── data_processing/ # Document loading and chunking
-│   ├── embeddings/      # Text embedding utilities
-│   ├── vectorstore/     # Vector database operations
-│   ├── rag/             # RAG chain and agent logic
-│   └── api/             # FastAPI endpoints
-├── data/
-│   └── documents/       # ESTIN regulation documents (PDF, etc.)
-├── tests/               # Unit and integration tests
-├── notebooks/           # Jupyter notebooks for experimentation
-├── .env.example         # Environment variables template
-├── requirements.txt     # Python dependencies
-├── Dockerfile           # Container configuration
-└── docker-compose.yml   # Multi-container setup
+│   ├── api/            # FastAPI (routes, CORS, static)
+│   ├── config/         # Settings (.env)
+│   ├── data_processing/# Chargement PDF + chunking par article
+│   ├── embeddings/     # HuggingFace (multilingual-e5-large)
+│   ├── rag/            # Agent (outil recherche + mémoire)
+│   └── vectorstore/    # Pinecone
+├── data/documents/     # PDF du règlement
+├── scripts/
+│   └── build_index.py  # Construction de l’index Pinecone
+├── .env                # Clés API (à créer, ne pas committer)
+├── requirements.txt
+└── DOCUMENTATION_PROJET.md
 ```
 
-## 🚀 Quick Start
 
-### Prerequisites
-- Python 3.10+
-- Git
-- Docker (optional, for deployment)
+## Licence
 
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd RI_ESTIN_RAG
-   ```
-
-2. **Create virtual environment**
-   ```bash
-   python -m venv venv
-   # Windows
-   .\venv\Scripts\activate
-   # Linux/Mac
-   source venv/bin/activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your API keys (Pinecone, Groq, HuggingFace)
-   ```
-
-5. **Build the vector store index** ⚠️ **REQUIRED**
-   ```bash
-   python scripts/build_index.py
-   ```
-   This step is **necessary** - it loads the PDF documents, chunks them, generates embeddings, and uploads them to Pinecone. Without this, the RAG system won't have any documents to retrieve from.
-
-6. **Run the application**
-   ```bash
-   uvicorn src.api.main:app --reload
-   ```
-
-## 🛠️ Technologies
-
-- **LangChain v1.x** - LLM application framework
-- **FastAPI** - Modern web framework
-- **ChromaDB/FAISS** - Vector database
-- **OpenAI** - Embeddings and LLM
-- **Docker** - Containerization
-
-## 📚 Learning Resources
-
-This project serves as a learning resource for AI Engineering. Each module contains educational comments explaining:
-- Why certain design decisions were made
-- How components work together
-- Best practices in production AI systems
-
-## 📄 License
-
-MIT License - See LICENSE file for details.
-
+MIT 

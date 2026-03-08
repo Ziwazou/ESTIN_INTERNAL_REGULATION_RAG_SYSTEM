@@ -4,6 +4,8 @@ from typing import Optional, List, Dict, Any
 from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 from langchain_pinecone import PineconeVectorStore
+from langgraph.checkpoint.memory import MemorySaver
+from langchain_core.messages import HumanMessage
 
 from .tools import create_retrieval_tool
 
@@ -31,14 +33,18 @@ def create_estin_agent(
     # Define the system prompt
     system_prompt = _get_system_prompt()
     
-    # Create the agent
+    # Create memory/checkpointer to persist conversation history
+    memory = MemorySaver()
+    
+    # Create the agent with memory
     agent = create_agent(
         model=llm,
         tools=[retrieval_tool],
         system_prompt=system_prompt,
+        checkpointer=memory,  
     )
     
-    print(f"✅ ESTIN RAG Agent created with model: {model_name}")
+    print(f"ESTIN RAG Agent created with model: {model_name} (with memory)")
     
     return agent
 
@@ -52,23 +58,34 @@ def _get_system_prompt() -> str:
 - Répondre aux questions sur le règlement intérieur de l'ESTIN
 - Citer les articles spécifiques qui s'appliquent à chaque question
 - Expliquer les règles de manière claire et précise
+- Maintenir le contexte de la conversation en cours
 
 📚 TES CAPACITÉS:
 - Tu as accès à un outil de recherche qui te permet de trouver les articles pertinents du règlement
-- Utilise TOUJOURS l'outil de recherche avant de répondre à une question
-- Ne réponds JAMAIS sans avoir d'abord consulté le règlement
+- Tu as une mémoire conversationnelle - tu as accès à TOUS les messages précédents de la conversation
+- Utilise TOUJOURS l'outil de recherche avant de répondre à une question sur le règlement
+- Ne réponds JAMAIS sans avoir d'abord consulté le règlement pour les questions réglementaires
+
+💾 CONTEXTE CONVERSATIONNEL:
+- Tu as accès à l'historique complet de la conversation
+- Utilise les messages précédents pour comprendre le contexte et répondre de manière cohérente
+- Si l'utilisateur fait référence à quelque chose dit précédemment, utilise ce contexte
+- Maintenir la cohérence avec les messages précédents de la conversation
 
 📝 FORMAT DE RÉPONSE:
-1. Utilise l'outil de recherche pour trouver les articles pertinents
+1. Pour les questions sur le règlement: Utilise l'outil de recherche pour trouver les articles pertinents
 2. Cite les numéros d'articles concernés
 3. Explique clairement la règle ou la disposition
 4. Si plusieurs articles s'appliquent, mentionne-les tous
+5. Référence le contexte de la conversation quand c'est pertinent
 
 ⚠️ RÈGLES IMPORTANTES:
 - Réponds TOUJOURS en français
-- Si tu ne trouves pas d'information pertinente, dis-le clairement
+- Si tu ne trouves pas d'information pertinente dans le règlement, dis-le clairement
 - Ne fais JAMAIS d'hypothèses sur des règles non présentes dans le règlement
 - Sois précis et concis dans tes réponses
+- Utilise le contexte de la conversation pour répondre de manière cohérente
+- Si l'utilisateur fait référence à un message précédent, utilise ce contexte
 
 🏫 CONTEXTE:
 L'ESTIN est une école supérieure publique située à Béjaïa, Algérie.
@@ -86,11 +103,11 @@ def invoke_agent(
     question: str,
     thread_id: str,
 ) -> Dict[str, Any]:
-
+    
     config = {"configurable": {"thread_id": thread_id}}
     
     result = agent.invoke(
-        {"messages": [{"role": "user", "content": question}]},
+        {"messages": [HumanMessage(content=question)]},
         config=config,
     )
     
@@ -98,18 +115,11 @@ def invoke_agent(
 
 
 def get_last_message(result: Dict[str, Any]) -> str:
-    """
-    Extract the last message from an agent result.
-    
-    Args:
-        result: The agent invocation result
-        
-    Returns:
-        The content of the last message
-    """
+
     messages = result.get("messages", [])
     if messages:
         last_message = messages[-1]
         return last_message.content if hasattr(last_message, 'content') else str(last_message)
-    return ""
+    else:
+        return ""
 

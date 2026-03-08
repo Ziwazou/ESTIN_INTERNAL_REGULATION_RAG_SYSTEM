@@ -6,7 +6,7 @@ from langchain_core.documents import Document
 
 
 def load_estin_regulations( file_path: str ) -> List[Document]:
-    
+    """load the estin regulations from a pdf file"""
     pdf_path = Path(file_path)
     
     if not pdf_path.exists():

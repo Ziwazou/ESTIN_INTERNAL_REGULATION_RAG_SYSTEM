@@ -8,17 +8,9 @@ from pinecone import Pinecone, ServerlessSpec
 
 
 def init_pinecone(api_key: str) -> Pinecone:
-    """
-    Initialize Pinecone client.
     
-    Args:
-        api_key: Pinecone API key
-        
-    Returns:
-        Pinecone client instance
-    """
     pc = Pinecone(api_key=api_key)
-    print("✅ Pinecone client initialized")
+    print("Pinecone client initialized")
     return pc
 
 
@@ -62,28 +54,20 @@ def create_vector_store(
     # Get the index
     index = pc.Index(index_name)
     
-    print(f"🗄️ Creating vector store with {len(documents)} documents...")
     
-    # Set environment variable for PineconeVectorStore
-    # (from_documents needs PINECONE_API_KEY env var)
     original_api_key = os.environ.get("PINECONE_API_KEY")
     os.environ["PINECONE_API_KEY"] = pinecone_api_key
     
     try:
-        # Create vector store from documents
         vector_store = PineconeVectorStore.from_documents(
             documents=documents,
             embedding=embeddings,
             index_name=index_name,
         )
-    finally:
-        # Restore original API key if it existed
-        if original_api_key:
-            os.environ["PINECONE_API_KEY"] = original_api_key
-        elif "PINECONE_API_KEY" in os.environ:
-            del os.environ["PINECONE_API_KEY"]
+    except Exception as e:
+        print(f"Error creating vector store: {e}")
     
-    print(f"✅ Vector store created successfully!")
+    print(f"Vector store created successfully!")
     
     return vector_store
 
@@ -100,7 +84,7 @@ def load_vector_store(
     # Get the index
     index = pc.Index(index_name)
     
-    print(f"📂 Loading vector store from index: {index_name}")
+    print(f"Loading vector store from index: {index_name}")
     
     vector_store = PineconeVectorStore(
         index=index,
@@ -111,7 +95,7 @@ def load_vector_store(
     stats = index.describe_index_stats()
     total_vectors = stats.total_vector_count
     
-    print(f"✅ Loaded vector store with {total_vectors} vectors")
+    print(f"Loaded vector store with {total_vectors} vectors")
     
     return vector_store
 
@@ -121,17 +105,7 @@ def similarity_search(
     query: str,
     k: int = 4,
 ) -> List[Document]:
-    """
-    Search for similar documents.
     
-    Args:
-        vector_store: The Pinecone vector store
-        query: The search query
-        k: Number of results to return
-        
-    Returns:
-        List of most similar documents
-    """
     results = vector_store.similarity_search(query, k=k)
     return results
 
@@ -140,15 +114,7 @@ def delete_index(
     pinecone_api_key: str,
     index_name: str,
 ) -> None:
-    """
-    Delete a Pinecone index.
     
-    Args:
-        pinecone_api_key: Pinecone API key
-        index_name: Name of the index to delete
-    """
     pc = init_pinecone(pinecone_api_key)
-    
-    print(f"🗑️ Deleting index: {index_name}")
     pc.delete_index(index_name)
-    print(f"✅ Index '{index_name}' deleted")
+    print(f"Index '{index_name}' deleted")

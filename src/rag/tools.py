@@ -1,11 +1,3 @@
-"""
-RAG Tools module - Retrieval tools for the ESTIN regulations agent.
-
-In LangChain v1.0+, RAG is implemented as an agent with tools.
-The retrieval tool wraps the vector store search functionality,
-allowing the agent to decide when and how to retrieve information.
-"""
-
 from typing import List, Tuple
 from langchain.tools import tool
 from langchain_core.documents import Document
@@ -16,32 +8,11 @@ def create_retrieval_tool(
     vector_store: PineconeVectorStore,
     k: int = 4,
 ):
-    """
-    Create a retrieval tool that searches the ESTIN regulations.
     
-    Args:
-        vector_store: The Pinecone vector store with indexed documents
-        k: Number of documents to retrieve per query
-        
-    Returns:
-        A tool function that can be used by the agent
-    """
     
     @tool(response_format="content_and_artifact")
     def retrieve_estin_regulations(query: str) -> Tuple[str, List[Document]]:
-        """
-        Rechercher des informations dans le règlement intérieur de l'ESTIN.
-        
-        Utilisez cet outil pour trouver des articles et dispositions spécifiques
-        concernant les règles de l'école, les obligations des enseignants,
-        le régime disciplinaire, l'hygiène et sécurité, etc.
-        
-        Args:
-            query: La question ou le sujet à rechercher (en français)
-            
-        Returns:
-            Les articles pertinents du règlement intérieur avec leurs sources
-        """
+        """Recherche dans le règlement intérieur ESTIN les articles pertinents pour une question donnée (en français)."""
         # Search for relevant documents
         retrieved_docs = vector_store.similarity_search(query, k=k)
         
@@ -51,7 +22,7 @@ def create_retrieval_tool(
         )
         
         # Add header
-        result = f"📚 {len(retrieved_docs)} articles trouvés dans le règlement intérieur:\n\n{serialized}"
+        result = f"{len(retrieved_docs)} articles trouvés dans le règlement intérieur:\n\n{serialized}"
         
         return result, retrieved_docs
     
@@ -59,16 +30,6 @@ def create_retrieval_tool(
 
 
 def _format_document(doc: Document, index: int) -> str:
-    """
-    Format a document for display with metadata.
-    
-    Args:
-        doc: The document to format
-        index: The result number
-        
-    Returns:
-        Formatted string with source and content
-    """
     metadata = doc.metadata
     
     # Extract relevant metadata

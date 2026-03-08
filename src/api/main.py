@@ -1,32 +1,27 @@
-"""
-ESTIN RAG API - FastAPI Application
-
-REST API for querying the ESTIN internal regulations using RAG.
-"""
-
 import sys
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 from uuid import uuid4
 from contextlib import asynccontextmanager
 
-# Add project root to path (for direct execution)
 project_root = Path(__file__).parent.parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from src.config.settings import Settings, get_settings
+
+# Frontend directory path
+FRONTEND_DIR = Path(__file__).parent.parent.parent / "frontend"
 from src.rag import invoke_agent, get_last_message
 from src.api.dependencies import get_agent_instance
 
 
-# =============================================================================
-# Request/Response Models
-# =============================================================================
 
 class QuestionRequest(BaseModel):
     """Request model for asking a question."""
@@ -68,18 +63,12 @@ class ErrorResponse(BaseModel):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Application lifespan manager.
     
-    This runs on startup and shutdown:
-    - Startup: Initialize connections (lazy loading on first request)
-    - Shutdown: Clean up resources
-    """
     # Startup
-    print("🚀 Starting ESTIN RAG API...")
+    print("Starting ESTIN RAG API...")
     yield
     # Shutdown
-    print("👋 Shutting down ESTIN RAG API...")
+    print("Shutting down ESTIN RAG API...")
 
 
 # =============================================================================
@@ -92,21 +81,6 @@ app = FastAPI(
     API pour interroger le règlement intérieur de l'ESTIN 
     (École Supérieure en Sciences et Technologies de l'Informatique et du Numérique).
     
-    ## Fonctionnalités
-    
-    * **Question-Réponse**: Posez des questions sur le règlement et obtenez des réponses précises
-    
-    ## Exemple d'utilisation
-    
-    ```python
-    import requests
-    
-    response = requests.post(
-        "http://localhost:8000/api/v1/ask",
-        json={"question": "Quelles sont les sanctions du 3ème degré?"}
-    )
-    print(response.json()["answer"])
-    ```
     """,
     version="1.0.0",
     lifespan=lifespan,
@@ -127,8 +101,13 @@ app.add_middleware(
 
 
 # =============================================================================
-# Health Check Endpoints
+# Static Files (Frontend)
 # =============================================================================
+
+# Mount static files for frontend assets (CSS, JS)
+if FRONTEND_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
+
 
 @app.get(
     "/health",
@@ -137,9 +116,7 @@ app.add_middleware(
     summary="Vérifier l'état du service",
 )
 async def health_check():
-    """
-    Vérifier l'état de santé de l'API et de ses composants.
-    """
+    
     return HealthResponse(
         status="healthy",
         version="1.0.0",
@@ -152,11 +129,15 @@ async def health_check():
 
 @app.get(
     "/",
-    tags=["Health"],
-    summary="Racine de l'API",
+    tags=["Frontend"],
+    summary="Interface utilisateur",
+    include_in_schema=False,
 )
 async def root():
-    """Point d'entrée de l'API."""
+    """Serve the frontend interface."""
+    frontend_index = FRONTEND_DIR / "index.html"
+    if frontend_index.exists():
+        return FileResponse(str(frontend_index))
     return {
         "message": "Bienvenue sur l'API ESTIN RAG",
         "docs": "/docs",
@@ -164,9 +145,19 @@ async def root():
     }
 
 
-# =============================================================================
-# Question-Answering Endpoints
-# =============================================================================
+@app.get(
+    "/api",
+    tags=["Health"],
+    summary="Racine de l'API",
+)
+async def api_root():
+    """Point d'entrée de l'API."""
+    return {
+        "message": "Bienvenue sur l'API ESTIN RAG",
+        "docs": "/docs",
+        "health": "/health",
+    }
+
 
 @app.post(
     "/api/v1/ask",
@@ -181,14 +172,7 @@ async def ask_question(
     request: QuestionRequest,
     settings: Settings = Depends(get_settings),
 ):
-    """
-    Poser une question sur le règlement intérieur de l'ESTIN.
     
-    L'agent RAG va:
-    1. Rechercher les articles pertinents
-    2. Générer une réponse basée sur le contexte
-    3. Citer les sources utilisées
-    """
     try:
         # Get or create thread_id
         thread_id = request.thread_id or str(uuid4())
@@ -218,16 +202,10 @@ async def ask_question(
         )
 
 
-# =============================================================================
-# Helper Functions
-# =============================================================================
+# 
 
 def _extract_sources(result: dict) -> list:
-    """
-    Extract source documents from agent result.
     
-    Looks for tool call artifacts that contain retrieved documents.
-    """
     sources = []
     messages = result.get("messages", [])
     
@@ -246,18 +224,16 @@ def _extract_sources(result: dict) -> list:
     return sources
 
 
-# =============================================================================
-# Run with Uvicorn (for development)
-# =============================================================================
+
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     settings = get_settings()
     uvicorn.run(
-        "src.api.main:app",
+        app,
         host=settings.api_host,
         port=settings.api_port,
-        reload=True,
+        reload=False,
     )
 
