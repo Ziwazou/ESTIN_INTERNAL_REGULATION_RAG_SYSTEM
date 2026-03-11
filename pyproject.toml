@@ -1,0 +1,14 @@
+[project]
+name = "ri-estin-rag"
+version = "1.0.0"
+description = "RAG system for ESTIN internal regulations"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+app = "src.api.main:app"
+
+[tool.vercel]
+# Optional: build step before deploy (e.g. build_index is run separately)
+# build = "echo 'No build step'"
