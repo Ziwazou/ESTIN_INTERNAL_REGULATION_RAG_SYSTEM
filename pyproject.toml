@@ -4,7 +4,25 @@ version = "1.0.0"
 description = "RAG system for ESTIN internal regulations"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "python-multipart>=0.0.9",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.10.0,<3.0.0",
+    "pydantic-settings>=2.0.0",
+    "langchain>=1.2.0",
+    "langchain-core>=1.2.0",
+    "langchain-community>=0.4.0",
+    "langchain-openai>=1.0.0",
+    "langchain-huggingface>=0.1.0",
+    "langchain-groq>=0.2.0",
+    "langgraph>=1.0.0",
+    "langchain-text-splitters>=1.0.0",
+    "pinecone>=5.0.0",
+    "langchain-pinecone>=0.2.0",
+    "python-docx>=1.1.0",
+]
 
 [project.scripts]
 app = "src.api.main:app"
