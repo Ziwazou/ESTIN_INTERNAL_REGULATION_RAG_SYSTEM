@@ -24,7 +24,7 @@ Frontend (chat)  →  API FastAPI  →  Agent RAG (LangGraph)
 - **RAG** : `src/rag/` — agent avec outil de recherche et mémoire
 - **Vector store** : `src/vectorstore/` — Pinecone (embeddings HuggingFace)
 
-Pour plus de détails, voir [DOCUMENTATION_PROJET.md](DOCUMENTATION_PROJET.md).
+
 
 ## Prérequis
 

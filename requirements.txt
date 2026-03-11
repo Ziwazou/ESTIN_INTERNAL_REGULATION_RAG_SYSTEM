@@ -6,65 +6,32 @@ langchain-huggingface>=0.1.0
 langchain-groq>=0.2.0
 langgraph>=1.0.0
 
-# -----------------------------------------------------------------------------
-# Text Processing
-# -----------------------------------------------------------------------------
-# langchain-text-splitters: For chunking documents into smaller pieces
-# Must be v1.0+ to match langchain v1.x ecosystem
+
 langchain-text-splitters>=1.0.0
 
-# -----------------------------------------------------------------------------
-# Vector Stores
-# -----------------------------------------------------------------------------
-# pinecone: Managed cloud vector database
-# langchain-pinecone: LangChain integration for Pinecone
+
 pinecone>=5.0.0
 langchain-pinecone>=0.2.0
 
-# -----------------------------------------------------------------------------
-# Document Loaders
-# -----------------------------------------------------------------------------
-# pypdf: For loading PDF documents (ESTIN regulations are likely PDFs)
-# python-docx: For Word documents
-# unstructured: Universal document parser
-pypdf>=4.0.0
+# ----------------------------------------------------------------------------
 python-docx>=1.1.0
 
-# -----------------------------------------------------------------------------
-# API Framework
-# -----------------------------------------------------------------------------
-# fastapi: Modern, fast web framework for building APIs
-# uvicorn: ASGI server to run FastAPI
-# python-multipart: For file uploads
+
 fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
 python-multipart>=0.0.9
 
-# -----------------------------------------------------------------------------
-# Configuration & Environment
-# -----------------------------------------------------------------------------
-# python-dotenv: Load environment variables from .env file
-# pydantic-settings: Settings management with validation
-# pydantic: Data validation (v2.10+ required for LangChain v1.x)
 python-dotenv>=1.0.0
 pydantic>=2.10.0,<3.0.0
 pydantic-settings>=2.0.0
 
-# -----------------------------------------------------------------------------
-# Development Tools
-# -----------------------------------------------------------------------------
-# pytest: Testing framework
-# black: Code formatter
-# isort: Import sorter
-# mypy: Static type checker
+
 pytest>=8.0.0
 black>=24.0.0
 isort>=5.13.0
 mypy>=1.8.0
 
-# -----------------------------------------------------------------------------
-# Jupyter (for experimentation)
-# -----------------------------------------------------------------------------
+
 jupyter>=1.0.0
 ipykernel>=6.29.0
 

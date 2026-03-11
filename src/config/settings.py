@@ -10,25 +10,19 @@ class Settings(BaseSettings):
 
     pinecone_api_key: str
     
-    # -------------------------------------------------------------------------
     # Vector Store Configuration (Pinecone)
-    # -------------------------------------------------------------------------
     pinecone_index_name: str = "estin-regulations"
     pinecone_cloud: str = "aws"
     pinecone_region: str = "us-east-1"
     
-    # -------------------------------------------------------------------------
     # Application Settings
-    # -------------------------------------------------------------------------
     environment: str = "development"
     api_host: str = "127.0.0.1"
     api_port: int = 8000
     log_level: str = "INFO"
     
     
-    # -------------------------------------------------------------------------
     # Pydantic Settings Configuration
-    # -------------------------------------------------------------------------
     model_config = SettingsConfigDict(
         # 💡 This tells Pydantic where to find the .env file
         env_file=".env",
@@ -39,22 +33,6 @@ class Settings(BaseSettings):
     )
 
 
-# =============================================================================
-# Settings Singleton Pattern
-# =============================================================================
-# 
-# 💡 WHAT IS @lru_cache?
-# lru_cache is a decorator that caches function results. The first time 
-# get_settings() is called, it creates a Settings instance. All subsequent 
-# calls return the same cached instance.
-#
-# 💡 WHY USE THIS PATTERN?
-# 1. Performance: Settings are only loaded once
-# 2. Consistency: All parts of the app use the same settings instance
-# 3. Memory: No duplicate Settings objects
-#
-# This is called the "Singleton Pattern" - ensuring only one instance exists.
-# =============================================================================
 
 @lru_cache()
 def get_settings() -> Settings:

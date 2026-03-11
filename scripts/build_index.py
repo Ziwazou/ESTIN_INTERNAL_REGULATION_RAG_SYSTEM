@@ -22,7 +22,7 @@ def build_index(reset: bool = False):
     
     # Step 1: Load documents
     documents = load_estin_regulations(str(pdf_path))
-    print(f"✅ Loaded {len(documents)} pages")
+    print(f"Loaded {len(documents)} pages")
     
     # Step 2: Chunk by articles
     chunks = chunk_by_articles(documents, include_section_context=True)
@@ -51,7 +51,7 @@ def build_index(reset: bool = False):
         index_name=settings.pinecone_index_name,
     )
     
-    print("✅ Index build completed successfully!")
+    print("Index build completed successfully!")
     
     return vector_store
 
